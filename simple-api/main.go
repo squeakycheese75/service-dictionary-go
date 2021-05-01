@@ -8,10 +8,15 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
-	sources "github.com/squeakycheese75/service-dictionary-go/simple-api/controllers"
-
+	"github.com/squeakycheese75/service-dictionary-go/simple-api/controllers"
 	dataTypes "github.com/squeakycheese75/service-dictionary-go/simple-api/data"
+)
+
+const (
+    dsn = "host=localhost user=postgres password=changeme dbname=postgres port=5432 sslmode=disable"
 )
 
 func homePage(w http.ResponseWriter, r *http.Request){
@@ -24,22 +29,55 @@ func handleRequests() {
     myRouter := mux.NewRouter().StrictSlash(true)
 	// Sources 
     myRouter.HandleFunc("/", homePage)
-    myRouter.HandleFunc("/sources", sources.GetSources)
-	myRouter.HandleFunc("/source", sources.CreateSource).Methods("POST")
-	myRouter.HandleFunc("/source/{id}", sources.UpdateSource).Methods("PUT")
-	myRouter.HandleFunc("/source/{id}", sources.DeleteSource).Methods("DELETE")
-	myRouter.HandleFunc("/source/{id}", sources.GetSource)
+	// Sources
+    myRouter.HandleFunc("/sources", controllers.GetSources)
+	myRouter.HandleFunc("/source", controllers.CreateSource).Methods("POST")
+	myRouter.HandleFunc("/source/{id}", controllers.UpdateSource).Methods("PUT")
+	myRouter.HandleFunc("/source/{id}", controllers.DeleteSource).Methods("DELETE")
+	myRouter.HandleFunc("/source/{id}", controllers.GetSource)
+	// Products
+	myRouter.HandleFunc("/products", controllers.GetProducts)
+	myRouter.HandleFunc("/product", controllers.CreateProduct).Methods("POST")
 
     log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
 
 
+func initialSetup() {
+	fmt.Println("Starting inital migration ..")
+
+	// dsn := "host=localhost user=postgres password=changeme dbname=postgres port=5432 sslmode=disable"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	// db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	  }
+	fmt.Println("Connected to db ..")
+
+	db.AutoMigrate(&dataTypes.Product{})
+
+	// Create
+	// db.Create(&dataTypes.Product{Code: "D42", Price: 100})
+
+	// Read
+	// var product dataTypes.Product
+	// db.First(&product, 1) // find product with integer primary key
+	// db.First(&product, "code = ?", "D42") // find product with code D42
+	
+    // Migrate the schema
+  
+	fmt.Println("Completed inital migration ..")
+}
+
 func main(){
 	fmt.Println("Rest API v2.0 - Mux Routers")
 
-	dataTypes.Sources = []dataTypes.Source{
-		{Id:"1", Name:"source_a", Desc: "some description a"},
-		{Id:"2", Name:"source_b", Desc: "some description b"},
-	}
+	// dataTypes.Sources = []dataTypes.Source{
+	// 	{Id:"1", Name:"source_a", Desc: "some description a"},
+	// 	{Id:"2", Name:"source_b", Desc: "some description b"},
+	// }
+	// Add the call to our new initialMigration function
+	initialSetup()
+
 	handleRequests()
 }
