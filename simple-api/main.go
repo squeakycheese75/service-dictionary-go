@@ -29,9 +29,7 @@ func handleRequests() {
 	myRouter.HandleFunc("/source/{id}", sources.UpdateSource).Methods("PUT")
 	myRouter.HandleFunc("/source/{id}", sources.DeleteSource).Methods("DELETE")
 	myRouter.HandleFunc("/source/{id}", sources.GetSource)
-    // finally, instead of passing in nil, we want
-    // to pass in our newly created router as the second
-    // argument
+
     log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
 
