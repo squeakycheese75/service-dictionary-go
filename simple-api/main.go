@@ -54,10 +54,12 @@ func initialSetup() {
 	  }
 	fmt.Println("Connected to db ..")
 
-	db.AutoMigrate(&dataTypes.Product{})
+	// db.AutoMigrate(&dataTypes.Product{})
+	db.AutoMigrate(&dataTypes.Source{})
 
 	// Create
-	// db.Create(&dataTypes.Product{Code: "D42", Price: 100})
+	// /db.Create(&dataTypes.Product{Code: "D42", Price: 100})
+	// db.Create(&dataTypes.Source{Name: "Some_db", Desc: "some db description", Endpoint: "asdad.asdasd.asdsad.asdasd"})
 
 	// Read
 	// var product dataTypes.Product
@@ -72,10 +74,6 @@ func initialSetup() {
 func main(){
 	fmt.Println("Rest API v2.0 - Mux Routers")
 
-	// dataTypes.Sources = []dataTypes.Source{
-	// 	{Id:"1", Name:"source_a", Desc: "some description a"},
-	// 	{Id:"2", Name:"source_b", Desc: "some description b"},
-	// }
 	// Add the call to our new initialMigration function
 	initialSetup()
 

@@ -3,9 +3,11 @@ package dataTypes
 import "gorm.io/gorm"
 
 type Source struct{
-	Id string `json:"id"`
+	gorm.Model
 	Name string `json:"name"`
     Desc string `json:"desc"`
+	// SourceTypeId int `json:"source_type_id"`
+	Endpoint string `json:"endpoint"`
 }
 
 
