@@ -36,8 +36,8 @@ func handleRequests() {
 	myRouter.HandleFunc("/source/{id}", controllers.DeleteSource).Methods("DELETE")
 	myRouter.HandleFunc("/source/{id}", controllers.GetSource)
 	// Products
-	myRouter.HandleFunc("/products", controllers.GetProducts)
-	myRouter.HandleFunc("/product", controllers.CreateProduct).Methods("POST")
+	// myRouter.HandleFunc("/products", controllers.GetProducts)
+	// myRouter.HandleFunc("/product", controllers.CreateProduct).Methods("POST")
 
     log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
@@ -56,10 +56,14 @@ func initialSetup() {
 
 	// db.AutoMigrate(&dataTypes.Product{})
 	db.AutoMigrate(&dataTypes.Source{})
+	db.AutoMigrate(&dataTypes.SourceType{})
 
 	// Create
 	// /db.Create(&dataTypes.Product{Code: "D42", Price: 100})
 	// db.Create(&dataTypes.Source{Name: "Some_db", Desc: "some db description", Endpoint: "asdad.asdasd.asdsad.asdasd"})
+	// db.Create(&dataTypes.SourceType{ID: 1, Name: "SQL"})
+	// db.Create(&dataTypes.SourceType{ID: 2, Name: "CSV"})
+	// db.Create(&dataTypes.Source{Name: "Some_db", Desc: "some db description", Endpoint: "asdad.asdasd.asdsad.asdasd", SourceTypeID: 1})
 
 	// Read
 	// var product dataTypes.Product
