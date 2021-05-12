@@ -3,6 +3,7 @@ package data
 import (
 	"fmt"
 
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -23,24 +24,25 @@ func GetDb() *gorm.DB {
 	if err != nil {
 		panic("failed to connect database")
 	}
+	// defer db.Close()
+	fmt.Println("Connected to db ..")
+	return db
+}
+
+func getDbPostgres() *gorm.DB {
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
 	// fmt.Println("Connected to db ..")
 	return db
 }
 
-// func getDbPostgres() *gorm.DB {
-// 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-// 	if err != nil {
-// 		panic("failed to connect database")
-// 	}
-// 	// fmt.Println("Connected to db ..")
-// 	return db
-// }
-
-// func getDbSqlLite() *gorm.DB {
-// 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-// 	if err != nil {
-// 		panic("failed to connect database")
-// 	}
-// 	// fmt.Println("Connected to db ..")
-// 	return db
-// }
+func getDbSqlLite() *gorm.DB {
+	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+	// fmt.Println("Connected to db ..")
+	return db
+}

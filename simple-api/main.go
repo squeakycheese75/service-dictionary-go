@@ -3,56 +3,25 @@ package main
 import (
 	"fmt"
 
-	"log"
-
 	"net/http"
+
+	"log"
 
 	"github.com/gorilla/mux"
 
 	"github.com/squeakycheese75/service-dictionary-go/simple-api/controllers"
+	"github.com/squeakycheese75/service-dictionary-go/simple-api/data"
 	dataTypes "github.com/squeakycheese75/service-dictionary-go/simple-api/data"
+	"github.com/squeakycheese75/service-dictionary-go/simple-api/env"
 )
-
-func handleRequests() {
-	// creates a new instance of a mux router
-	myRouter := mux.NewRouter().StrictSlash(true)
-	// Home
-	myRouter.HandleFunc("/", controllers.GetHomePage)
-	// Sources
-	myRouter.HandleFunc("/sources", controllers.GetSources)
-	myRouter.HandleFunc("/source", controllers.CreateSource).Methods("POST")
-	myRouter.HandleFunc("/source/{id}", controllers.UpdateSource).Methods("PUT")
-	myRouter.HandleFunc("/source/{id}", controllers.DeleteSource).Methods("DELETE")
-	myRouter.HandleFunc("/source/{id}", controllers.GetSource)
-	// Products
-	myRouter.HandleFunc("/sourceTypes", controllers.GetSourceTypes)
-	myRouter.HandleFunc("/sourceType", controllers.CreateSourceType).Methods("POST")
-	myRouter.HandleFunc("/sourceType/{id}", controllers.UpdateSourceType).Methods("PUT")
-	myRouter.HandleFunc("/sourceType/{id}", controllers.DeleteSourceType).Methods("DELETE")
-	myRouter.HandleFunc("/sourceType/{id}", controllers.GetSourceType)
-
-	log.Fatal(http.ListenAndServe(":10000", myRouter))
-}
 
 func initialSetup() {
 	fmt.Println("Starting inital migration ..")
 
-	// dsn := "host=localhost user=postgres password=changeme dbname=postgres port=5432 sslmode=disable"
-	// db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	// // db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
-	// if err != nil {
-	// 	panic("failed to connect database")
-	// }
-	// fmt.Println("Connected to db ..")
-	// db := GetDb()
-
-	// db.AutoMigrate(&dataTypes.Product{})
 	dataTypes.GetDb().AutoMigrate(&dataTypes.Source{})
 	dataTypes.GetDb().AutoMigrate(&dataTypes.SourceType{})
 
 	// Create
-	// /db.Create(&dataTypes.Product{Code: "D42", Price: 100})
-	// dataTypes.GetDb().Create(&dataTypes.Source{Name: "Some_db", Desc: "some db description", Endpoint: "asdad.asdasd.asdsad.asdasd"})
 	// dataTypes.GetDb().Create(&dataTypes.SourceType{Name: "SQL"})
 	// dataTypes.GetDb().Create(&dataTypes.SourceType{Name: "CSV"})
 	// dataTypes.GetDb().Create(&dataTypes.Source{Name: "Some_db", Desc: "some db description", Endpoint: "asdad.asdasd.asdsad.asdasd", SourceTypeID: 1})
@@ -67,11 +36,34 @@ func initialSetup() {
 	fmt.Println("Completed inital migration ..")
 }
 
+func handleRequests(env *env.Env) {
+	myRouter := mux.NewRouter().StrictSlash(true)
+	// Home
+	myRouter.HandleFunc("/", controllers.GetHomePage)
+	// Sources
+	log.Println("heavy is the head the wears the crown")
+	myRouter.HandleFunc("/sources", controllers.GetSources(env))
+	myRouter.HandleFunc("/source", controllers.CreateSource(env)).Methods("POST")
+	myRouter.HandleFunc("/source/{id}", controllers.UpdateSource(env)).Methods("PUT")
+	myRouter.HandleFunc("/source/{id}", controllers.DeleteSource(env)).Methods("DELETE")
+	myRouter.HandleFunc("/source/{id}", controllers.GetSource(env))
+	// SourceTypes
+	myRouter.HandleFunc("/sourceTypes", controllers.GetSourceTypes(env))
+	myRouter.HandleFunc("/sourceType", controllers.CreateSourceType(env)).Methods("POST")
+	myRouter.HandleFunc("/sourceType/{id}", controllers.UpdateSourceType(env)).Methods("PUT")
+	myRouter.HandleFunc("/sourceType/{id}", controllers.DeleteSourceType(env)).Methods("DELETE")
+	myRouter.HandleFunc("/sourceType/{id}", controllers.GetSourceType(env))
+
+	log.Fatal(http.ListenAndServe(":10000", myRouter))
+}
+
 func main() {
 	fmt.Println("Rest API v2.0 - Mux Routers")
+	// set container
+	env := &env.Env{DB: data.GetDb()}
 
 	// Add the call to our new initialMigration function
 	initialSetup()
 
-	handleRequests()
+	handleRequests(env)
 }

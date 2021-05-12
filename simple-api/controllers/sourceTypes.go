@@ -6,84 +6,94 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	data "github.com/squeakycheese75/service-dictionary-go/simple-api/data"
+	"github.com/squeakycheese75/service-dictionary-go/simple-api/data"
+	"github.com/squeakycheese75/service-dictionary-go/simple-api/env"
 	"github.com/squeakycheese75/service-dictionary-go/simple-api/utils"
 )
 
-// SouceTypes
-func GetSourceTypes(w http.ResponseWriter, r *http.Request) {
-	var entities []data.SourceType
-	if result := data.GetDb().Find(&entities); result.Error != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, result.Error.Error())
-		return
+func GetSourceTypes(env *env.Env) func(http.ResponseWriter, *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+		var entities []data.SourceType
+		if result := env.DB.Find(&entities); result.Error != nil {
+			utils.RespondWithError(res, http.StatusInternalServerError, result.Error.Error())
+			return
+		}
+		utils.RespondWithJSON(res, http.StatusOK, entities)
 	}
-	utils.RespondWithJSON(w, http.StatusOK, entities)
 }
 
-func GetSourceType(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
+func GetSourceType(env *env.Env) func(http.ResponseWriter, *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		id := vars["id"]
 
-	var entity data.SourceType
-	if result := data.GetDb().First(&entity, id); result.Error != nil {
-		utils.RespondWithError(w, http.StatusNotFound, result.Error.Error())
-		return
+		var entity data.SourceType
+		if result := env.DB.First(&entity, id); result.Error != nil {
+			utils.RespondWithError(res, http.StatusNotFound, result.Error.Error())
+			return
+		}
+		utils.RespondWithJSON(res, http.StatusOK, entity)
 	}
-	utils.RespondWithJSON(w, http.StatusOK, entity)
 }
 
-func CreateSourceType(w http.ResponseWriter, r *http.Request) {
-	var entity data.SourceType
-	decoder := json.NewDecoder(r.Body)
+func CreateSourceType(env *env.Env) func(http.ResponseWriter, *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+		var entity data.SourceType
+		decoder := json.NewDecoder(req.Body)
 
-	if err := decoder.Decode(&entity); err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
-		return
-	}
-	defer r.Body.Close()
+		if err := decoder.Decode(&entity); err != nil {
+			utils.RespondWithError(res, http.StatusBadRequest, "Invalid request payload")
+			return
+		}
+		defer req.Body.Close()
 
-	if result := data.GetDb().Create(&data.SourceType{Name: entity.Name}); result.Error != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, result.Error.Error())
-		return
+		if result := env.DB.Create(&data.SourceType{Name: entity.Name}); result.Error != nil {
+			utils.RespondWithError(res, http.StatusInternalServerError, result.Error.Error())
+			return
+		}
+		utils.RespondWithJSON(res, http.StatusCreated, entity)
 	}
-	utils.RespondWithJSON(w, http.StatusCreated, entity)
 }
 
-func UpdateSourceType(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, "Invalid SourceTypeID")
-		return
-	}
+func UpdateSourceType(env *env.Env) func(http.ResponseWriter, *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		id, err := strconv.Atoi(vars["id"])
+		if err != nil {
+			utils.RespondWithError(res, http.StatusBadRequest, "Invalid SourceTypeID")
+			return
+		}
 
-	var entity data.SourceType
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&entity); err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
-		return
-	}
-	defer r.Body.Close()
-	entity.ID = uint(id)
+		var entity data.SourceType
+		decoder := json.NewDecoder(req.Body)
+		if err := decoder.Decode(&entity); err != nil {
+			utils.RespondWithError(res, http.StatusBadRequest, "Invalid request payload")
+			return
+		}
+		defer req.Body.Close()
+		entity.ID = uint(id)
 
-	if err := data.GetDb().Save(&entity).Error; err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
-		return
+		if err := env.DB.Save(&entity).Error; err != nil {
+			utils.RespondWithError(res, http.StatusInternalServerError, err.Error())
+			return
+		}
+		utils.RespondWithJSON(res, http.StatusOK, entity)
 	}
-	utils.RespondWithJSON(w, http.StatusOK, entity)
 }
 
-func DeleteSourceType(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		utils.RespondWithError(w, http.StatusBadRequest, "Invalid SourceTypeID")
-		return
-	}
+func DeleteSourceType(env *env.Env) func(http.ResponseWriter, *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		id, err := strconv.Atoi(vars["id"])
+		if err != nil {
+			utils.RespondWithError(res, http.StatusBadRequest, "Invalid SourceTypeID")
+			return
+		}
 
-	if err := data.GetDb().Delete(&data.SourceType{}, id).Error; err != nil {
-		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
-		return
+		if err := env.DB.Delete(&data.SourceType{}, id).Error; err != nil {
+			utils.RespondWithError(res, http.StatusInternalServerError, err.Error())
+			return
+		}
+		utils.RespondWithJSON(res, http.StatusOK, map[string]string{"result": "success"})
 	}
-	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
