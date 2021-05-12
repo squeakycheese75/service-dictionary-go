@@ -1,26 +1,23 @@
-package dataTypes
+package data
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
-type Source struct{
+type Source struct {
+	gorm.Model
+	Name         string `json:"name"`
+	Desc         string `json:"desc"`
+	SourceTypeID int    `json:"source_type_id"`
+	Endpoint     string `json:"endpoint"`
+}
+
+type SourceType struct {
 	gorm.Model
 	Name string `json:"name"`
-    Desc string `json:"desc"`
-	SourceTypeID int `json:"source_type_id"`
-	Endpoint string `json:"endpoint"`
 }
 
-type SourceType struct{
-	ID   int
-  	Name string
-}
-
-// type Product struct {
+// type DataSet struct {
 // 	gorm.Model
-// 	Code  string `json:"code"`
-// 	Price uint `json:"price"`
-//   }
-  
-
-// var Sources []Source
-// var Products []Product
+// 	Name string `json:"name"`
+// }
