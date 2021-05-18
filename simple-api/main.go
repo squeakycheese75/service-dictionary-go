@@ -23,9 +23,9 @@ func initialSetup() {
 	// dataTypes.GetDb().AutoMigrate(&dataTypes.DataSet{})
 
 	// Create
-	dataTypes.GetDb().Create(&dataTypes.SourceType{Name: "SQL"})
-	dataTypes.GetDb().Create(&dataTypes.SourceType{Name: "CSV"})
-	dataTypes.GetDb().Create(&dataTypes.Source{Name: "Some_db", Desc: "some db description", Endpoint: "asdad.asdasd.asdsad.asdasd", SourceTypeID: 1})
+	// dataTypes.GetDb().Create(&dataTypes.SourceType{Name: "SQL"})
+	// dataTypes.GetDb().Create(&dataTypes.SourceType{Name: "CSV"})
+	// dataTypes.GetDb().Create(&dataTypes.Source{Name: "Some_db", Desc: "some db description", Endpoint: "asdad.asdasd.asdsad.asdasd", SourceTypeID: 1})
 
 	// Read
 	// var product dataTypes.Product
