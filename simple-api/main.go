@@ -23,9 +23,9 @@ func initialSetup() {
 	// dataTypes.GetDb().AutoMigrate(&dataTypes.DataSet{})
 
 	// Create
-	// dataTypes.GetDb().Create(&dataTypes.SourceType{Name: "SQL"})
-	// dataTypes.GetDb().Create(&dataTypes.SourceType{Name: "CSV"})
-	// dataTypes.GetDb().Create(&dataTypes.Source{Name: "Some_db", Desc: "some db description", Endpoint: "asdad.asdasd.asdsad.asdasd", SourceTypeID: 1})
+	dataTypes.GetDb().Create(&dataTypes.SourceType{Name: "SQL"})
+	dataTypes.GetDb().Create(&dataTypes.SourceType{Name: "CSV"})
+	dataTypes.GetDb().Create(&dataTypes.Source{Name: "Some_db", Desc: "some db description", Endpoint: "asdad.asdasd.asdsad.asdasd", SourceTypeID: 1})
 
 	// Read
 	// var product dataTypes.Product
@@ -41,19 +41,26 @@ func handleRequests(env *env.Env) {
 	myRouter := mux.NewRouter().StrictSlash(true)
 	// Home
 	myRouter.HandleFunc("/", controllers.GetHomePage)
+	apiRouter := myRouter.PathPrefix("/api").Subrouter()
 	// Sources
 	log.Println("heavy is the head the wears the crown")
-	myRouter.HandleFunc("/sources", controllers.GetSources(env))
-	myRouter.HandleFunc("/source", controllers.CreateSource(env)).Methods("POST")
-	myRouter.HandleFunc("/source/{id}", controllers.UpdateSource(env)).Methods("PUT")
-	myRouter.HandleFunc("/source/{id}", controllers.DeleteSource(env)).Methods("DELETE")
-	myRouter.HandleFunc("/source/{id}", controllers.GetSource(env))
+	apiRouter.HandleFunc("/sources", controllers.GetSources(env))
+	apiRouter.HandleFunc("/source", controllers.CreateSource(env)).Methods("POST")
+	apiRouter.HandleFunc("/source/{id}", controllers.UpdateSource(env)).Methods("PUT")
+	apiRouter.HandleFunc("/source/{id}", controllers.DeleteSource(env)).Methods("DELETE")
+	apiRouter.HandleFunc("/source/{id}", controllers.GetSource(env))
 	// SourceTypes
-	myRouter.HandleFunc("/sourceTypes", controllers.GetSourceTypes(env))
-	myRouter.HandleFunc("/sourceType", controllers.CreateSourceType(env)).Methods("POST")
-	myRouter.HandleFunc("/sourceType/{id}", controllers.UpdateSourceType(env)).Methods("PUT")
-	myRouter.HandleFunc("/sourceType/{id}", controllers.DeleteSourceType(env)).Methods("DELETE")
-	myRouter.HandleFunc("/sourceType/{id}", controllers.GetSourceType(env))
+	apiRouter.HandleFunc("/sourceTypes", controllers.GetSourceTypes(env))
+	apiRouter.HandleFunc("/sourceType", controllers.CreateSourceType(env)).Methods("POST")
+	apiRouter.HandleFunc("/sourceType/{id}", controllers.UpdateSourceType(env)).Methods("PUT")
+	apiRouter.HandleFunc("/sourceType/{id}", controllers.DeleteSourceType(env)).Methods("DELETE")
+	apiRouter.HandleFunc("/sourceType/{id}", controllers.GetSourceType(env))
+	// DataSets
+	apiRouter.HandleFunc("/dataSets", controllers.GetDataSets(env))
+	apiRouter.HandleFunc("/dataSet", controllers.CreateDataSet(env)).Methods("POST")
+	apiRouter.HandleFunc("/dataSet/{id}", controllers.UpdateDataSet(env)).Methods("PUT")
+	apiRouter.HandleFunc("/dataSet/{id}", controllers.DeleteDataSet(env)).Methods("DELETE")
+	apiRouter.HandleFunc("/dataSet/{id}", controllers.GetDataSet(env))
 
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
