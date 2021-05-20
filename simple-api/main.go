@@ -61,6 +61,8 @@ func handleRequests(env *env.Env) {
 	apiRouter.HandleFunc("/dataSet/{id}", controllers.UpdateDataSet(env)).Methods("PUT")
 	apiRouter.HandleFunc("/dataSet/{id}", controllers.DeleteDataSet(env)).Methods("DELETE")
 	apiRouter.HandleFunc("/dataSet/{id}", controllers.GetDataSet(env))
+	// Data
+	apiRouter.HandleFunc("/data/{id}", controllers.GetData(env))
 
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
