@@ -6,9 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/controllers"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/data"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/env"
+	"github.com/squeakycheese75/service-dictionary-go/api/controllers"
+	"github.com/squeakycheese75/service-dictionary-go/api/data"
+	"github.com/squeakycheese75/service-dictionary-go/api/env"
 )
 
 // func createSource(t *testing.T, db *gorm.DB) {

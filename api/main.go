@@ -9,10 +9,10 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/controllers"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/data"
-	dataTypes "github.com/squeakycheese75/service-dictionary-go/simple-api/data"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/env"
+	"github.com/squeakycheese75/service-dictionary-go/api/controllers"
+	"github.com/squeakycheese75/service-dictionary-go/api/data"
+	dataTypes "github.com/squeakycheese75/service-dictionary-go/api/data"
+	"github.com/squeakycheese75/service-dictionary-go/api/env"
 )
 
 func initialSetup() {

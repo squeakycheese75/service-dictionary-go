@@ -1,4 +1,4 @@
-# Service-dictionary-go
+# service-dictionary-go
 
 Having a bit of a play around with go. Roughly I'm buiding a:
 
