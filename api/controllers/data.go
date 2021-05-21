@@ -13,20 +13,35 @@ import (
 	"github.com/streadway/amqp"
 )
 
+const RABBITMQ_QUEUE_NAME = "sd_orchestrator"
+const RABBITMQ_CONNECTION = "amqp://guest:guest@localhost:5672/"
+
+type Message struct {
+	Name   string
+	UUID   string
+	Params []string
+}
+
 func failOnError(err error, msg string) {
 	if err != nil {
-		log.Fatalf("%s: %s", msg, err)
+		log.Printf("%v: %v", msg, err)
+		return
 	}
 }
 
-
-func requestDataRpc(uuid string) (res string, err error) {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
+func requestDataRpc(msg Message) (res string, err error) {
+	conn, err := amqp.Dial(RABBITMQ_CONNECTION)
+	if err != nil {
+		log.Printf("Failed to connect to RabbitMQ: %v", err)
+		return
+	}
 	defer conn.Close()
 
 	ch, err := conn.Channel()
-	failOnError(err, "Failed to open a channel")
+	if err != nil {
+		log.Printf("Failed to open a channel: %v", err)
+		return
+	}
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
@@ -37,7 +52,10 @@ func requestDataRpc(uuid string) (res string, err error) {
 		false, // noWait
 		nil,   // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.Printf("Failed to declare a queue: %v", err)
+		return
+	}
 
 	msgs, err := ch.Consume(
 		q.Name, // queue
@@ -48,38 +66,36 @@ func requestDataRpc(uuid string) (res string, err error) {
 		false,  // no-wait
 		nil,    // args
 	)
-	failOnError(err, "Failed to register a consumer")
-
-    corrId := satori_uuid.NewV4().String()
-
-	type Message struct {
-		Name string
-		UUID string
+	if err != nil {
+		log.Printf("Failed to register a consumer: %v", err)
+		return
 	}
-	
-	m := Message{"Alice", uuid}
-	b, err := json.Marshal(m)
 
+	// Create correlationId
+	corrId := satori_uuid.NewV4().String()
+	json_msg, err := json.Marshal(msg)
 
 	err = ch.Publish(
-		"",          // exchange
-		"sd_orchestrator", // routing key
-		false,       // mandatory
-		false,       // immediate
+		"",                  // exchange
+		RABBITMQ_QUEUE_NAME, // routing key
+		false,               // mandatory
+		false,               // immediate
 		amqp.Publishing{
 			ContentType:   "application/json",
 			CorrelationId: corrId,
 			ReplyTo:       q.Name,
-			Body:		   b,
+			Body:          json_msg,
 			// Body:          []byte(uuid),
 		})
-	failOnError(err, "Failed to publish a message")
+	if err != nil {
+		log.Printf("ailed to publish a message: %v", err)
+		return
+	}
 
 	for d := range msgs {
 		if corrId == d.CorrelationId {
 
 			res = string(d.Body)
-			failOnError(err, "Failed to convert body to integer")
 			break
 		}
 	}
@@ -91,7 +107,9 @@ func GetData(env *env.Env) func(http.ResponseWriter, *http.Request) {
 		vars := mux.Vars(req)
 		uuid := vars["id"]
 
-		resval, err := requestDataRpc(uuid)
+		msg := Message{"Alice", uuid, nil}
+
+		resval, err := requestDataRpc(msg)
 		if err != nil {
 			utils.RespondWithError(res, http.StatusServiceUnavailable, "Unable to request data from orchestrator")
 			return
