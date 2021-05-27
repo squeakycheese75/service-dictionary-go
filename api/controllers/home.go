@@ -7,6 +7,5 @@ import (
 )
 
 func GetHomePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Welcome to my home page!")
-	fmt.Println("Endpoint Hit: home")
+	fmt.Fprintln(w, "Welcome to my protected home page!")
 }
