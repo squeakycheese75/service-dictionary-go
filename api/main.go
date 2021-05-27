@@ -8,6 +8,7 @@ import (
 
 	"log"
 
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 
 	"github.com/squeakycheese75/service-dictionary-go/api/controllers"
@@ -15,10 +16,36 @@ import (
 	"github.com/squeakycheese75/service-dictionary-go/api/env"
 )
 
+var mySigningKey = []byte("your-256-bit-secret-key")
+
+func isAuthorized(endpoint func(http.ResponseWriter, *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header["Token"] != nil {
+			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
+				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+					return nil, fmt.Errorf("There was an error!")
+				}
+				return mySigningKey, nil
+			})
+			if err != nil {
+				fmt.Fprintf(w, err.Error())
+			}
+
+			if token.Valid {
+				endpoint(w, r)
+			}
+
+		} else {
+			fmt.Fprintf(w, "Not authorized.")
+		}
+	})
+}
+
 func handleRequests(env *env.Env) {
 	myRouter := mux.NewRouter().StrictSlash(true)
 	// Home
-	myRouter.HandleFunc("/", controllers.GetHomePage)
+	myRouter.Handle("/", isAuthorized(controllers.GetHomePage))
+	// myRouter.HandleFunc("/", controllers.GetHomePage)
 	apiRouter := myRouter.PathPrefix("/api").Subrouter()
 	// Sources
 	log.Println("heavy is the head the wears the crown")
@@ -42,7 +69,7 @@ func handleRequests(env *env.Env) {
 	// Data
 	apiRouter.HandleFunc("/data/{id}", controllers.GetData(env))
 
-	muxWithMiddlewares := http.TimeoutHandler(apiRouter, time.Second*60, "Timeout!")
+	muxWithMiddlewares := http.TimeoutHandler(myRouter, time.Second*60, "Timeout!")
 
 	log.Fatal(http.ListenAndServe(":10000", muxWithMiddlewares))
 }
