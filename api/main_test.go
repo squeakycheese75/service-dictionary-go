@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/controllers"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/data"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/env"
+	"github.com/squeakycheese75/service-dictionary-go/api/controllers"
+	"github.com/squeakycheese75/service-dictionary-go/api/data"
+	"github.com/squeakycheese75/service-dictionary-go/api/env"
 )
 
 // func createSource(t *testing.T, db *gorm.DB) {
@@ -21,7 +22,31 @@ import (
 // 		db.Delete(&source)
 // 	})
 // }
+// TestMain will exec each test, one by one
+func TestMain(m *testing.M) {
+	// You create an Person and you save in database
+	// setUp(&Person{
+	// 	ID:   personID,
+	// 	Name: personName,
+	// 	Age:  19,
+	// })
+	retCode := m.Run()
+	// When you have executed the test, the Person is deleted from database
+	// tearDown(personID)
+	os.Exit(retCode)
+}
 
+func setUp() {
+	// ...
+	// db.add(P)
+	// ...
+}
+
+func tearDown(id int) {
+	// ...
+	// db.delete(id)
+	// ...
+}
 func TestGetSourcesHandler(t *testing.T) {
 	env := &env.Env{DB: data.GetDb()}
 

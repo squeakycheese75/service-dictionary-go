@@ -6,28 +6,28 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/data"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/env"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/utils"
+	"github.com/squeakycheese75/service-dictionary-go/api/data"
+	"github.com/squeakycheese75/service-dictionary-go/api/env"
+	"github.com/squeakycheese75/service-dictionary-go/api/utils"
 )
 
-func GetDataSets(env *env.Env) func(http.ResponseWriter, *http.Request) {
+func GetSourceTypes(env *env.Env) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
-		var entity []data.DataSet
-		if result := env.DB.Find(&entity); result.Error != nil {
+		var entities []data.SourceType
+		if result := env.DB.Find(&entities); result.Error != nil {
 			utils.RespondWithError(res, http.StatusInternalServerError, result.Error.Error())
 			return
 		}
-		utils.RespondWithJSON(res, http.StatusOK, entity)
+		utils.RespondWithJSON(res, http.StatusOK, entities)
 	}
 }
 
-func GetDataSet(env *env.Env) func(http.ResponseWriter, *http.Request) {
+func GetSourceType(env *env.Env) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		id := vars["id"]
 
-		var entity data.DataSet
+		var entity data.SourceType
 		if result := env.DB.First(&entity, id); result.Error != nil {
 			utils.RespondWithError(res, http.StatusNotFound, result.Error.Error())
 			return
@@ -36,9 +36,9 @@ func GetDataSet(env *env.Env) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func CreateDataSet(env *env.Env) func(http.ResponseWriter, *http.Request) {
+func CreateSourceType(env *env.Env) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
-		var entity data.DataSet
+		var entity data.SourceType
 		decoder := json.NewDecoder(req.Body)
 
 		if err := decoder.Decode(&entity); err != nil {
@@ -47,7 +47,7 @@ func CreateDataSet(env *env.Env) func(http.ResponseWriter, *http.Request) {
 		}
 		defer req.Body.Close()
 
-		if result := env.DB.Create(&data.DataSet{Name: entity.Name, Desc: entity.Desc, Body: entity.Body, SourceId: entity.SourceId}); result.Error != nil {
+		if result := env.DB.Create(&data.SourceType{Name: entity.Name}); result.Error != nil {
 			utils.RespondWithError(res, http.StatusInternalServerError, result.Error.Error())
 			return
 		}
@@ -55,16 +55,16 @@ func CreateDataSet(env *env.Env) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func UpdateDataSet(env *env.Env) func(http.ResponseWriter, *http.Request) {
+func UpdateSourceType(env *env.Env) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		id, err := strconv.Atoi(vars["id"])
 		if err != nil {
-			utils.RespondWithError(res, http.StatusBadRequest, "Invalid DataSetID")
+			utils.RespondWithError(res, http.StatusBadRequest, "Invalid SourceTypeID")
 			return
 		}
 
-		var entity data.DataSet
+		var entity data.SourceType
 		decoder := json.NewDecoder(req.Body)
 		if err := decoder.Decode(&entity); err != nil {
 			utils.RespondWithError(res, http.StatusBadRequest, "Invalid request payload")
@@ -81,16 +81,16 @@ func UpdateDataSet(env *env.Env) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func DeleteDataSet(env *env.Env) func(http.ResponseWriter, *http.Request) {
+func DeleteSourceType(env *env.Env) func(http.ResponseWriter, *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		id, err := strconv.Atoi(vars["id"])
 		if err != nil {
-			utils.RespondWithError(res, http.StatusBadRequest, "Invalid DataSet ID")
+			utils.RespondWithError(res, http.StatusBadRequest, "Invalid SourceTypeID")
 			return
 		}
 
-		if err := env.DB.Delete(&data.DataSet{}, id).Error; err != nil {
+		if err := env.DB.Delete(&data.SourceType{}, id).Error; err != nil {
 			utils.RespondWithError(res, http.StatusInternalServerError, err.Error())
 			return
 		}

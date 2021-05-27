@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/data"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/env"
-	"github.com/squeakycheese75/service-dictionary-go/simple-api/utils"
+	"github.com/squeakycheese75/service-dictionary-go/api/data"
+	"github.com/squeakycheese75/service-dictionary-go/api/env"
+	"github.com/squeakycheese75/service-dictionary-go/api/utils"
 )
 
 func GetSources(env *env.Env) func(http.ResponseWriter, *http.Request) {
