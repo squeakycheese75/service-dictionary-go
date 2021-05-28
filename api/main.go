@@ -1,54 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"net/http"
 
 	"log"
 
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 
+	auth "github.com/squeakycheese75/service-dictionary-go/api/auth"
 	"github.com/squeakycheese75/service-dictionary-go/api/controllers"
 	"github.com/squeakycheese75/service-dictionary-go/api/data"
 	"github.com/squeakycheese75/service-dictionary-go/api/env"
 )
 
-var mySigningKey = []byte("your-256-bit-secret-key")
-
-func isAuthorized(endpoint func(http.ResponseWriter, *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header["Token"] != nil {
-			token, err := jwt.Parse(r.Header["Token"][0], func(token *jwt.Token) (interface{}, error) {
-				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					return nil, fmt.Errorf("There was an error!")
-				}
-				return mySigningKey, nil
-			})
-			if err != nil {
-				fmt.Fprintf(w, err.Error())
-			}
-
-			if token.Valid {
-				endpoint(w, r)
-			}
-
-		} else {
-			fmt.Fprintf(w, "Not authorized.")
-		}
-	})
-}
-
 func handleRequests(env *env.Env) {
 	myRouter := mux.NewRouter().StrictSlash(true)
 	// Home
-	myRouter.Handle("/", isAuthorized(controllers.GetHomePage))
+	myRouter.Handle("/", auth.IsAuthorized(controllers.GetHomePage))
 	// myRouter.HandleFunc("/", controllers.GetHomePage)
 	apiRouter := myRouter.PathPrefix("/api").Subrouter()
 	// Sources
-	log.Println("heavy is the head the wears the crown")
+
 	apiRouter.HandleFunc("/sources", controllers.GetSources(env))
 	apiRouter.HandleFunc("/source", controllers.CreateSource(env)).Methods("POST")
 	apiRouter.HandleFunc("/source/{id}", controllers.UpdateSource(env)).Methods("PUT")
@@ -71,11 +45,12 @@ func handleRequests(env *env.Env) {
 
 	muxWithMiddlewares := http.TimeoutHandler(myRouter, time.Second*60, "Timeout!")
 
+	log.Println("Starting listening on 10000")
 	log.Fatal(http.ListenAndServe(":10000", muxWithMiddlewares))
 }
 
 func main() {
-	fmt.Println("Rest API v2.0 - Mux Routers")
+	// fmt.Println("Rest API v2.0 - Mux Routers")
 	// set container
 	env := &env.Env{DB: data.GetDb()}
 
