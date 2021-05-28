@@ -22,12 +22,12 @@ type Message struct {
 	Params []string
 }
 
-func failOnError(err error, msg string) {
-	if err != nil {
-		log.Printf("%v: %v", msg, err)
-		return
-	}
-}
+// func failOnError(err error, msg string) {
+// 	if err != nil {
+// 		log.Printf("%v: %v", msg, err)
+// 		return
+// 	}
+// }
 
 func requestDataRpc(msg Message) (res string, err error) {
 	conn, err := amqp.Dial(RABBITMQ_CONNECTION)
@@ -88,7 +88,7 @@ func requestDataRpc(msg Message) (res string, err error) {
 			// Body:          []byte(uuid),
 		})
 	if err != nil {
-		log.Printf("ailed to publish a message: %v", err)
+		log.Printf("Failed to publish a message: %v", err)
 		return
 	}
 
@@ -107,7 +107,7 @@ func GetData(env *env.Env) func(http.ResponseWriter, *http.Request) {
 		vars := mux.Vars(req)
 		uuid := vars["id"]
 
-		msg := Message{"Alice", uuid, nil}
+		msg := Message{"Bob", uuid, nil}
 
 		resval, err := requestDataRpc(msg)
 		if err != nil {
