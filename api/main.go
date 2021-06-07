@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"net/http"
@@ -50,7 +51,7 @@ func handleRequests(env *env.Env) {
 }
 
 func main() {
-	// fmt.Println("Rest API v2.0 - Mux Routers")
+	fmt.Println("Service Dictionary Rest API - Started")
 	// set container
 	env := &env.Env{DB: data.GetDb()}
 

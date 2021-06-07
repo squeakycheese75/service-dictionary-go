@@ -7,8 +7,12 @@ WORKDIR /github.com/squeakycheese75/service-dictionary-go/api/
 COPY ./api/. /github.com/squeakycheese75/service-dictionary-go/api/
 COPY go.* /github.com/squeakycheese75/service-dictionary-go/
 
-RUN apk update && apk add git
+RUN apk update && apk add git && apk add build-base
 
-RUN CGO_ENABLED=0 go build -o /bin/sdapi
+RUN CGO_ENABLED=1 go build -o /bin/sdapi
 
-EXPOSE 10000
+# Should really just deploy the build app but this is ok for the time being. 
+
+EXPOSE 8080
+
+ENTRYPOINT ["/bin/sdapi"]
