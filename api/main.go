@@ -46,8 +46,8 @@ func handleRequests(env *env.Env) {
 
 	muxWithMiddlewares := http.TimeoutHandler(myRouter, time.Second*60, "Timeout!")
 
-	log.Println("Starting listening on 10000")
-	log.Fatal(http.ListenAndServe(":10000", muxWithMiddlewares))
+	log.Println("Starting listening on 8080")
+	log.Fatal(http.ListenAndServe(":8080", muxWithMiddlewares))
 }
 
 func main() {
