@@ -1,0 +1,20 @@
+# Testing Kubernetes Pod deploy
+apiVersion: v1
+kind: Pod
+metadata:
+  name: service-dictionary
+  labels: 
+    app: api
+spec:
+  containers:
+    - name: sd-api
+      image: squeskycheese/service-dictionary-api:latest
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "250m"
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 8080
