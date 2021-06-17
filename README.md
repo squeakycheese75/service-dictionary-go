@@ -7,9 +7,9 @@
 ## Docker Support
 
 ```bash
-docker build -t service-dict-go .  
+docker build -t service-dictionary-api .
 ```
 
 ```bash
-docker run -d --name myApp -p 8080:10000 service-dict-go
+docker run -d --name myApp -p 8080:10000 service-dictionary-api
 ```
