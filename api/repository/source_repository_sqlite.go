@@ -1,25 +1,36 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/squeakycheese75/service-dictionary-go/api/data"
-	env "github.com/squeakycheese75/service-dictionary-go/api/env"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 type repo struct{}
 
 var (
-	environment env.Env
+	db *gorm.DB
 )
 
-//NewSqlLiteSourceRepository creates a new repo
-func NewSqlLiteSourceRepository(env env.Env) SourceRepository {
-	environment = env
+func getDbSqlLite(name string) *gorm.DB {
+	db, err := gorm.Open(sqlite.Open(name), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+	fmt.Println("Connected to sqllite db ..")
+	return db
+}
+
+// Constructor
+func NewSqlLiteSourceRepository(name string) SourceRepository {
+	db = getDbSqlLite(name)
 	return &repo{}
 }
 
-
 func (*repo) Save(source *data.Source) (*data.Source, error) {
-	if result := environment.DB.Create(&data.Source{Name: source.Name, Desc: source.Desc, Endpoint: source.Endpoint, SourceTypeID: source.SourceTypeID}); result.Error != nil {
+	if result := db.Create(&data.Source{Name: source.Name, Desc: source.Desc, Endpoint: source.Endpoint, SourceTypeID: source.SourceTypeID}); result.Error != nil {
 		return nil, result.Error
 	}
 	return source, nil
@@ -27,8 +38,8 @@ func (*repo) Save(source *data.Source) (*data.Source, error) {
 
 func (*repo) FindAll() ([]data.Source, error) {
 	var sources []data.Source
-	environment.DB.Find(&sources)
-	if result := environment.DB.Find(&sources); result.Error != nil {
+	db.Find(&sources)
+	if result := db.Find(&sources); result.Error != nil {
 		return nil, result.Error
 	}
 	return sources, nil

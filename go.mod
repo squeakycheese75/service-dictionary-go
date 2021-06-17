@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/Rosaniline/gorm-ut v0.0.0-20190331143837-786b71894576
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/go-chi/chi v1.5.4
 	github.com/go-test/deep v1.0.7
 	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
