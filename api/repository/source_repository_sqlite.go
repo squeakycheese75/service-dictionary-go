@@ -14,7 +14,7 @@ var (
 	db *gorm.DB
 )
 
-func getDbSqlLite(name string) *gorm.DB {
+func connect(name string) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(name), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
@@ -25,14 +25,15 @@ func getDbSqlLite(name string) *gorm.DB {
 
 // Constructor
 func NewSqlLiteSourceRepository(name string) SourceRepository {
-	db = getDbSqlLite(name)
+	db = connect(name)
 	return &repo{}
 }
 
 func (*repo) Save(source *data.Source) (*data.Source, error) {
-	if result := db.Create(&data.Source{Name: source.Name, Desc: source.Desc, Endpoint: source.Endpoint, SourceTypeID: source.SourceTypeID}); result.Error != nil {
+	if result := db.Create(&source); result.Error != nil {
 		return nil, result.Error
 	}
+	fmt.Println(source.ID)
 	return source, nil
 }
 
@@ -43,4 +44,26 @@ func (*repo) FindAll() ([]data.Source, error) {
 		return nil, result.Error
 	}
 	return sources, nil
+}
+
+func (*repo) Update(source *data.Source) (*data.Source, error) {
+	if result := db.Save(&source); result.Error != nil {
+		return nil, result.Error
+	}
+	return source, nil
+}
+
+func (*repo) Find(id string) (*data.Source, error) {
+	var source data.Source
+	if result := db.First(&source, id); result.Error != nil {
+		return nil, result.Error
+	}
+	return &source, nil
+}
+
+func (*repo) Delete(id string) (bool, error) {
+	if err := db.Delete(&data.Source{}, id).Error; err != nil {
+		return false, err
+	}
+	return true, nil
 }

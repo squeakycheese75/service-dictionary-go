@@ -25,13 +25,6 @@ type Source struct {
 	Endpoint     string `json:"endpoint"`
 }
 
-// type Post struct {
-// 	ID    int64  `json:"id"`
-// 	Title string `json:"Title"`
-// 	Text  string `json:"Text"`
-// }
-
-
 type SourceType struct {
 	Base
 	Name string `json:"name"`
