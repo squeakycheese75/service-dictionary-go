@@ -8,4 +8,6 @@ type SourceRepository interface {
 	Update(source *data.Source) (*data.Source, error)
 	Find(id string) (*data.Source, error)
 	Delete(id string) (bool, error)
+	// SourceTyesmake
+	FindAllSourceTypes() ([]data.SourceType, error)
 }

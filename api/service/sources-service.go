@@ -4,28 +4,7 @@ import (
 	"errors"
 
 	"github.com/squeakycheese75/service-dictionary-go/api/data"
-	"github.com/squeakycheese75/service-dictionary-go/api/repository"
 )
-
-type SourceService interface {
-	Validate(source *data.Source) error
-	Create(source *data.Source) (*data.Source, error)
-	FindAll() ([]data.Source, error)
-	UpdateSource(source *data.Source) (*data.Source, error)
-	Find(id string) (*data.Source, error)
-	Delete(id string) (bool, error)
-}
-
-type service struct{}
-
-var (
-	repo repository.SourceRepository
-)
-
-func NewSourceService(repository repository.SourceRepository) SourceService {
-	repo = repository
-	return &service{}
-}
 
 func (*service) Validate(source *data.Source) error {
 	if source == nil {
@@ -57,4 +36,20 @@ func (*service) Find(id string) (*data.Source, error) {
 
 func (*service) Delete(id string) (bool, error) {
 	return repo.Delete(id)
+}
+
+func (*service) ValidateSourceType(sourceTyoe *data.SourceType) error {
+	if sourceTyoe == nil {
+		err := errors.New("The item is empty")
+		return err
+	}
+	if sourceTyoe.Name == "" {
+		err := errors.New("Name can't be empty")
+		return err
+	}
+	return nil
+}
+
+func (*service) FindAllSourceTypes() ([]data.SourceType, error) {
+	return repo.FindAllSourceTypes()
 }

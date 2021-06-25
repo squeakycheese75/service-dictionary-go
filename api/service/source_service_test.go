@@ -32,11 +32,15 @@ func (mock *MockRepository) Find(id string) (*data.Source, error) {
 	result := args.Get(0)
 	return result.(*data.Source), args.Error(1)
 }
-
 func (mock *MockRepository) Delete(id string) (bool, error) {
 	args := mock.Called()
 	result := args.Get(0)
 	return result.(bool), args.Error(1)
+}
+func (mock *MockRepository) FindAllSourceTypes() ([]data.SourceType, error) {
+	args := mock.Called()
+	result := args.Get(0)
+	return result.([]data.SourceType), args.Error(1)
 }
 
 func TestValidateEmptyPost(t *testing.T) {

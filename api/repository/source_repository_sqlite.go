@@ -64,3 +64,12 @@ func (*repo_sqlite) Delete(id string) (bool, error) {
 	}
 	return true, nil
 }
+
+func (*repo_sqlite) FindAllSourceTypes() ([]data.SourceType, error) {
+	var results []data.SourceType
+	db_sqlite.Find(&results)
+	if result := db_sqlite.Find(&results); result.Error != nil {
+		return nil, result.Error
+	}
+	return results, nil
+}

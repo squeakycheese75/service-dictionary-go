@@ -7,28 +7,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/squeakycheese75/service-dictionary-go/api/data"
-	"github.com/squeakycheese75/service-dictionary-go/api/service"
 	"github.com/squeakycheese75/service-dictionary-go/api/utils"
 )
-
-type controller struct{}
-
-var (
-	sourceService service.SourceService
-)
-
-type SourceController interface {
-	GetSources(response http.ResponseWriter, request *http.Request)
-	AddSource(response http.ResponseWriter, request *http.Request)
-	UpdateSource(response http.ResponseWriter, request *http.Request)
-	GetSource(response http.ResponseWriter, request *http.Request)
-	DeleteSource(response http.ResponseWriter, request *http.Request)
-}
-
-func NewSourceController(service service.SourceService) SourceController {
-	sourceService = service
-	return &controller{}
-}
 
 func (*controller) GetSources(response http.ResponseWriter, request *http.Request) {
 	sources, err := sourceService.FindAll()

@@ -63,3 +63,12 @@ func (*repo_postgres) Delete(id string) (bool, error) {
 	}
 	return true, nil
 }
+
+func (*repo_postgres) FindAllSourceTypes() ([]data.SourceType, error) {
+	var results []data.SourceType
+	db_sqlite.Find(&results)
+	if result := db_postgres.Find(&results); result.Error != nil {
+		return nil, result.Error
+	}
+	return results, nil
+}
